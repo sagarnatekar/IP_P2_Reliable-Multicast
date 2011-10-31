@@ -2,9 +2,8 @@ Point-to-Multipoint Reliable File Transfer Protocol implemented over UDP Sockets
 
 System Requirements:
 Programming Environment: C
-Compiler: gcc 4.1.2 (the same version is present on EOS machines)
-OS: Unix Based
-Tested On: VCL Image Name: Linux Lab Machine (Realm RHEnterprise 5) EOS lab machine images
+Compiler: gcc 4.1.2 
+OS: Unix 
 
 Compiling the Code: 
 1. We have created a Makefile that will generate all the required binaries to run the system.
