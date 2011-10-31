@@ -1,1 +1,82 @@
 Point-to-Multipoint Reliable File Transfer Protocol implemented over UDP Sockets in C
+
+System Requirements:
+Programming Environment: C
+Compiler: gcc 4.1.2 (the same version is present on EOS machines)
+OS: Unix Based
+Tested On: VCL Image Name: Linux Lab Machine (Realm RHEnterprise 5) EOS lab machine images
+
+Compiling the Code: 
+1. We have created a Makefile that will generate all the required binaries to run the system.
+2. We have created a sample file 100k.txt (~ 3MB file) to test the system.
+3. Under folder proj2 , we perform following commands.
+a. make clean ; make - This will create the required binaries for our project, viz.,     p2mpclient, p2mpserver
+4. We are now ready to start the system.
+
+Running the Code: 
+1. The system consists of multiple server(s) (Receiver(s)) and one client (Sender).
+2. First, we will have to start the server(s). To do so, for each server, we will run the following command: 
+
+./p2mpserver <port> Receiver<no.>.txt N p
+
+Thus, for example, if we have three servers, running on ports 6000, 6001 and 6002 and who will have destination files as Receiver1.txt, Receiver1.txt and Receiver1.txt with value of N as 512 and p as 0.05, they will start on different consoles as follows:
+
+./p2mpserver 6000 Receiver1.txt 512 0.05
+./p2mpserver 6001 Receiver2.txt 512 0.05
+./p2mpserver 6002 Receiver3.txt 512 0.05
+
+3. Then, we will have to start the client which will send the File to all the servers. The client takes following parameters from command line:
+  a. IP and Port of all the servers in the system
+	b. Input File Path
+	c. Value of N
+	d. Value of MSS
+	e. Value of Packet Timeout (in milliseconds)
+
+To run the client, we run the following command:
+./p2mpclient <ip1> <port1> <ip2> <port2> <ip3> <port3> Input_File N MSS Timeout
+
+For example, if we have 3 servers with IP and Port Numbers as: 
+192.168.2.3 6000
+192.168.2.4 6001
+192.168.2.5 6002
+
+And, with Input File Input.txt, value of N as 512, MSS as 1000 (bytes) and Timeout value as 100 milliseconds, the command for client will be as follows:
+
+./p2mpclient 192.168.2.3 6000 192.168.2.4 6001 192.168.2.5 6002 Input.txt 512 1000 100 
+
+Segments:
+There are two type of Segments
+1. Data Segment 
+2. Ack Segment
+
+1. Data Segment : A data Segment has 4 fields - 
+a. Sequence Number
+b. Packet Type
+c. Checksum
+d. Data
+
+Each field is separated by a Newline character <newline>
+The packet sent is
+ 
+<Sequence No><newline><Packet Type><newline><Checksum><newline><Data>
+
+The Data itself may contain <newline> but the code handles this situation.
+
+The four fields are explained below :
+a. Sequence Number: The sequence number of the packet. Sequence number is 32 bit. It starts from 0 and ranges till 232-1 (4294967295). The sequence numbers wrap around after it reaches max value.
+b. Packet type: Packet type is 16 bit field with value (5555)16. The value is set to (5500)16 for last packet.
+c. Checksum: This 16 bit field contains 1s complement checksum of data part.
+d. Data: This field actually contains the data to be transmitted.
+
+2. Ack Segment : An Ack Segment is similar to Data Segment but does not have the Data field - 
+a. Sequence Number
+b. Packet Type
+c. Checksum
+Each field is separated by a Newline character <newline>
+The packet sent is 
+<Sequence Number><newline><Packet Type><newline><Checksum>
+
+The fields are explained below
+a. Sequence Number: The sequence number of the segment for which acknowledgement is sent.
+b. Packet type: Packet type is 16 bit field with value (AAAA)16. The value is set to (00AA)16 for last segment.
+c. Checksum: This field is set to 0 for ack segment
